@@ -5,7 +5,7 @@ import { Button } from 'react-bootstrap';
 import { useAccordionButton } from 'react-bootstrap/AccordionButton';
 import Card from 'react-bootstrap/Card';
 import { ProblemNotes } from './components/ProblemNotes';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import problems from './problems'; // Import the problems array
 
 function CustomToggle({ children, eventKey }: {children?: any, eventKey: string}) {
@@ -35,47 +35,57 @@ function App() {
         setSeenProblems(updatedSeenProblems);
     };
 
+    // Group problems by category
+    const groupedProblems = problems.reduce((acc, problem) => {
+        (acc[problem.category] = acc[problem.category] || []).push(problem);
+        return acc;
+    }, {} as Record<string, typeof problems>);
+
     return (
         <div>
             <header style={{ textAlign: 'center', margin: '20px 0' }}>
                 <h1>LeetCode Tracker</h1>
             </header>
             <div className="table-container">
-                <Accordion className="table">
-                    <Card>
-                        {
-                            problems.map((problem, index) => {
-                                return (
-                                    <React.Fragment key={index}>
-                                        <Card.Header>
-                                            <p style={{backgroundColor: 'transparent'}}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={seenProblems[index] || false}
-                                                    onChange={() => handleCheckboxChange(index)}
-                                                />
-                                                {problem.linkTitle}
-                                                <span style={{ float: "right" }}>
-                                                    <CustomToggle eventKey={index.toString()}>Expand</CustomToggle>
-                                                </span>
-                                            </p>
-                                        </Card.Header>
-                                        <Accordion.Collapse eventKey={index.toString()}>
-                                            <Card.Body>
-                                                <ProblemNotes
-                                                    complexity={problem.complexity}
-                                                    link={problem.link}
-                                                    linkTitle={problem.linkTitle}
-                                                    notes={problem.notes}
-                                                />
-                                            </Card.Body>
-                                        </Accordion.Collapse>
-                                    </React.Fragment>
-                                )
-                            })
-                        }
-                    </Card>
-                </Accordion>
+                {Object.keys(groupedProblems).map((category) => (
+                    <div key={category} style={{ marginBottom: '20px', display: 'block' }}>
+                        <Accordion className="table">
+                        <h2 style={{ fontWeight: 'bold' }}>{category}</h2>
+                            {groupedProblems[category].map((problem, index) => (
+                                <Card key={index}>
+                                    <Card.Header>
+                                        <p style={{backgroundColor: 'transparent'}}>
+                                            <input
+                                                type="checkbox"
+                                                checked={seenProblems[index] || false}
+                                                onChange={() => handleCheckboxChange(index)}
+                                            />
+                                            {problem.linkTitle}
+                                            <span style={{ float: "right", marginLeft: '10px' }}>
+                                                <div style={{ display: 'inline-block', marginRight: '10px' }}>
+                                                    {Array.from({ length: 5 }, (_, starIndex) => (
+                                                        <span key={starIndex} style={{ color: starIndex < problem.difficulty ? '#FFD700' : 'transparent' }}>★</span>
+                                                    ))}
+                                                </div>
+                                                <CustomToggle eventKey={index.toString()}>Expand</CustomToggle>
+                                            </span>
+                                        </p>
+                                    </Card.Header>
+                                    <Accordion.Collapse eventKey={index.toString()}>
+                                        <Card.Body>
+                                            <ProblemNotes
+                                                complexity={problem.complexity}
+                                                link={problem.link}
+                                                linkTitle={problem.linkTitle}
+                                                notes={problem.notes}
+                                            />
+                                        </Card.Body>
+                                    </Accordion.Collapse>
+                                </Card>
+                            ))}
+                        </Accordion>
+                    </div>
+                ))}
             </div>
         </div>
     );

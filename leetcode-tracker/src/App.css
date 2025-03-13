@@ -1,75 +1,72 @@
-/* * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 75px;
-}
-
-body {
-  font-weight: 400;
-  overflow-x: hidden;
-  position: relative;
-  background-color: #121212 !important;
-  color: #fff !important;
-  font-family: 'Centra', sans-serif !important;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  margin: 0;
-  padding: 0;
-  line-height: normal;
-}
-
-p, a, li, button, ul {
-  margin: 0;
-  padding: 0;
-  line-height: normal;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: none;
-}
-
-img {
-  width: 100%;
-  height: auto;
-}
-
-button {
-  border: 0;
-  background-color: transparent;
-}
-
-input:focus, textarea:focus, select:focus {
-  outline: none;
-}
-
-@media (min-width:1700px) {
-	main .container {
-		max-width: 100%;
-		padding: 0 150px;
-	}
-}
-
-p.success {
-	color: green;
-}
-
-p.danger {
-	color: red;
-} */
-
 .table-container {
-    display: flex;
     justify-content: center; /* Center the table horizontally */
 }
 
 .table {
     width: 50%; /* Set the table width to 50% of the screen */
     margin: 0 auto; /* Center the table */
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center; /* Align checkbox and text vertically */
+    margin-bottom: 10px; /* Add space below each checkbox */
+    justify-content: space-between; /* Space between checkbox and arrow */
+}
+
+.checkbox-label input {
+    margin-right: 15px; /* Increase space between checkbox and text */
+    width: 20px; /* Optional: Adjust width for better appearance */
+    height: 20px; /* Optional: Adjust height for better appearance */
+}
+
+.custom-checkbox {
+    position: relative;
+    display: inline-block;
+    width: 24px; /* Width of the toggle */
+    height: 24px; /* Height of the toggle */
+}
+
+.custom-checkbox input {
+    opacity: 0; /* Hide the default checkbox */
+    width: 0;
+    height: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 24px; /* Width of the toggle */
+    height: 24px; /* Height of the toggle */
+    background-color: #ccc; /* Background color of the toggle */
+    border-radius: 4px; /* Rounded corners */
+}
+
+.custom-checkbox input:checked + .checkmark {
+    background-color: #2196F3; /* Color when checked */
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.custom-checkbox input:checked + .checkmark:after {
+    display: block;
+}
+
+.custom-checkbox .checkmark:after {
+    left: 8px;
+    top: 4px;
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.card {
+    border-radius: 0px;
 }
