@@ -30,6 +30,17 @@ const problems = [
     notes: 'Use two pointers to find the maximum profit. The left pointer is the minimum price and the right pointer is the maximum price.',
     difficulty: 1,
     category: 'Array'
+  },
+  {
+    complexity: 'O(n)',
+    link: 'https://leetcode.com/problems/insert-interval/',
+    linkTitle: 'Insert Interval',
+    notes: `Use a list to store the intervals. Iterate through the intervals and check if the current interval is overlapping with the previous interval.
+    If the new interval is overlapping & the new interval is older than the current interval then append the new one and return it alongside the rest.
+    If the new interval is greater than the current interval, then append the current interval and continue processing the others.
+    Else, find the min of the start & max of the end of the intervals and continue processing the others.`,
+    difficulty: 2,
+    category: 'Array'
   }
 ];
 
