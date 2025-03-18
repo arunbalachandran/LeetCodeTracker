@@ -19,19 +19,21 @@ function CustomToggle({ children, eventKey }: {children?: any, eventKey: string}
 }
 
 function App() {
-    const [seenProblems, setSeenProblems] = useState<boolean[]>(() => {
-        const storedSeenProblems = localStorage.getItem('seenProblems');
-        return storedSeenProblems ? JSON.parse(storedSeenProblems) : new Array(problems.length).fill(false);
+    const [seenProblems, setSeenProblems] = useState<Map<string, boolean>>(() => {
+        const storedProblems = localStorage.getItem('seenProblems');
+        return storedProblems ? new Map<string, boolean>(Object.entries(JSON.parse(storedProblems))) : new Map<string, boolean>();
     });
 
     // Save seen state to local storage whenever it changes
     useEffect(() => {
-        localStorage.setItem('seenProblems', JSON.stringify(seenProblems));
+        console.log("Called useEffect: " + JSON.stringify(seenProblems));
+        localStorage.setItem('seenProblems', JSON.stringify(Object.fromEntries(seenProblems)));
     }, [seenProblems]);
 
-    const handleCheckboxChange = (index: number) => {
-        const updatedSeenProblems = [...seenProblems];
-        updatedSeenProblems[index] = !updatedSeenProblems[index]; // Toggle the checkbox state
+    const handleCheckboxChange = (linkTitle: string) => {
+        const updatedSeenProblems = new Map<string, boolean>(seenProblems);
+        const currentState = !(updatedSeenProblems.get(linkTitle) || false); // Toggle the checkbox state
+        updatedSeenProblems.set(linkTitle, currentState);
         setSeenProblems(updatedSeenProblems);
     };
 
@@ -54,22 +56,22 @@ function App() {
                             {groupedProblems[category].map((problem, index) => (
                                 <Card key={index}>
                                     <Card.Header>
-                                        <p style={{backgroundColor: 'transparent'}}>
-                                            <input
-                                                type="checkbox"
-                                                checked={seenProblems[index] || false}
-                                                onChange={() => handleCheckboxChange(index)}
-                                            />
+                                        <input style={{float: 'left', marginTop: '13px'}}
+                                            type="checkbox"
+                                            checked={seenProblems.get(problem.linkTitle) || false}
+                                            onChange={() => handleCheckboxChange(problem.linkTitle)}
+                                        />
+                                        <p style={{display: 'inline-block', marginLeft: '10px', backgroundColor: 'transparent'}}>
                                             {problem.linkTitle}
-                                            <span style={{ float: "right", marginLeft: '10px' }}>
-                                                <div style={{ display: 'inline-block', marginRight: '10px' }}>
-                                                    {Array.from({ length: 5 }, (_, starIndex) => (
-                                                        <span key={starIndex} style={{ color: starIndex < problem.difficulty ? '#FFD700' : 'transparent' }}>★</span>
-                                                    ))}
-                                                </div>
-                                                <CustomToggle eventKey={index.toString()}>Expand</CustomToggle>
-                                            </span>
                                         </p>
+                                        <span style={{ float: "right", marginLeft: '10px', backgroundColor: 'transparent' }}>
+                                            <div style={{ display: 'inline-block', marginRight: '10px' }}>
+                                                {Array.from({ length: 5 }, (_, starIndex) => (
+                                                    <span key={starIndex} style={{ color: starIndex < problem.difficulty ? '#FFD700' : 'transparent' }}>★</span>
+                                                ))}
+                                            </div>
+                                            <CustomToggle eventKey={index.toString()}>Expand</CustomToggle>
+                                        </span>
                                     </Card.Header>
                                     <Accordion.Collapse eventKey={index.toString()}>
                                         <Card.Body>
