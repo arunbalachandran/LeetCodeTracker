@@ -7,6 +7,7 @@ import Card from 'react-bootstrap/Card';
 import { ProblemNotes } from './components/ProblemNotes';
 import { useEffect, useState } from 'react';
 import problems from './problems'; // Import the problems array
+import Checkbox from '@mui/material/Checkbox';
 
 function CustomToggle({ children, eventKey }: {children?: any, eventKey: string}) {
   const decoratedOnClick = useAccordionButton(eventKey, () => {});
@@ -56,14 +57,15 @@ function App() {
                             {groupedProblems[category].map((problem, index) => (
                                 <Card key={index}>
                                     <Card.Header>
-                                        <input style={{float: 'left', marginTop: '13px'}}
-                                            type="checkbox"
+                                        <Checkbox
                                             checked={seenProblems.get(problem.linkTitle) || false}
                                             onChange={() => handleCheckboxChange(problem.linkTitle)}
+                                            color="primary"
+                                            style={{ backgroundColor: 'transparent' }}
                                         />
-                                        <p style={{display: 'inline-block', marginLeft: '10px', backgroundColor: 'transparent'}}>
+                                        <label style={{ backgroundColor: 'transparent' }} htmlFor={`checkbox-${problem.linkTitle}`}>
                                             {problem.linkTitle}
-                                        </p>
+                                        </label>
                                         <span style={{ float: "right", marginLeft: '10px', backgroundColor: 'transparent' }}>
                                             <div style={{ display: 'inline-block', marginRight: '10px' }}>
                                                 {Array.from({ length: 5 }, (_, starIndex) => (
