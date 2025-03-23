@@ -45,6 +45,9 @@ npm run preview
 ```
 This will serve the built application locally for testing.
 
+## Adding problems
+Problems can be added in the problems.ts file
+
 ## Contributing
 If you want to contribute to this project, please fork the repository and create a pull request.
 
