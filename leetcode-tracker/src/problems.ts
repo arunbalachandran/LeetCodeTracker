@@ -38,6 +38,14 @@ const problems = [
     notes: 'Use two pointers to check if the string is a palindrome. Skip the non-alphanumeric characters.',
     difficulty: 2,
     category: 'Two Pointers'
+  },
+  {
+    complexity: 'O(n)',
+    link: 'https://leetcode.com/problems/valid-anagram/',
+    linkTitle: 'Valid Anagram',
+    notes: 'Keep track of the number of times the character appeared for both strings. Match the counts.',
+    difficulty: 1,
+    category: 'Array'
   }
 ];
 export default problems; 
