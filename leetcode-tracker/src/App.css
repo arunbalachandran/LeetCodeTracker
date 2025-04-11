@@ -70,3 +70,42 @@
 .card {
     border-radius: 0px;
 }
+
+.code-snippet-container {
+    margin: 20px 0;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.code-snippet-container pre {
+    margin: 0;
+    padding: 16px;
+    background-color: #f6f8fa;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    font-size: 14px;
+    line-height: 1.45;
+    overflow-x: auto;
+}
+
+.code-snippet-container .nav-tabs {
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #e1e4e8;
+}
+
+.code-snippet-container .nav-tabs .nav-link {
+    border: none;
+    color: #586069;
+    padding: 8px 16px;
+}
+
+.code-snippet-container .nav-tabs .nav-link.active {
+    background-color: #fff;
+    border: 1px solid #e1e4e8;
+    border-bottom-color: transparent;
+    color: #24292e;
+}
+
+.code-snippet-container .tab-content {
+    background-color: #fff;
+}
