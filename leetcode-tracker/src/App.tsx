@@ -8,12 +8,13 @@ import { ProblemNotes } from './components/ProblemNotes';
 import { useEffect, useState } from 'react';
 import problems from './problems'; // Import the problems array
 import Checkbox from '@mui/material/Checkbox';
+import { ProblemLabel } from './components/ProblemLabel';
 
 function CustomToggle({ children, eventKey }: {children?: any, eventKey: string}) {
   const decoratedOnClick = useAccordionButton(eventKey, () => {});
 
   return (
-    <Button onClick={decoratedOnClick}>
+    <Button onClick={decoratedOnClick} className="expand-button">
       {children}
     </Button>
   );
@@ -56,29 +57,40 @@ function App() {
                         <h2 style={{ fontWeight: 'bold' }}>{category}</h2>
                             {groupedProblems[category].map((problem, index) => (
                                 <Card key={index}>
-                                    <Card.Header>
+                                    <Card.Header className="card-header">
                                         <Checkbox
                                             checked={seenProblems.get(problem.linkTitle) || false}
                                             onChange={() => handleCheckboxChange(problem.linkTitle)}
                                             color="primary"
                                             style={{ backgroundColor: 'transparent' }}
                                         />
-                                        <label style={{ backgroundColor: 'transparent' }} htmlFor={`checkbox-${problem.linkTitle}`}>
+                                        <label style={{ backgroundColor: 'transparent', marginRight: '10px' }} htmlFor={`checkbox-${problem.linkTitle}`}>
                                             {problem.linkTitle}
                                         </label>
-                                        <span style={{ float: "right", marginLeft: '10px', backgroundColor: 'transparent' }}>
+                                        
+                                        <div className="problem-info">
+                                            {/* Problem Labels */}
+                                            <div className="label-container">
+                                                {problem.labels && problem.labels.map((label, labelIndex) => (
+                                                    <ProblemLabel key={labelIndex} label={label} />
+                                                ))}
+                                            </div>
+                                            
+                                            {/* Difficulty Stars */}
                                             <div style={{ display: 'inline-block', marginRight: '10px' }}>
                                                 {Array.from({ length: 5 }, (_, starIndex) => (
                                                     <span key={starIndex} style={{ color: starIndex < problem.difficulty ? '#FFD700' : 'transparent' }}>★</span>
                                                 ))}
                                             </div>
+                                            
                                             <CustomToggle eventKey={index.toString()}>Expand</CustomToggle>
-                                        </span>
+                                        </div>
                                     </Card.Header>
                                     <Accordion.Collapse eventKey={index.toString()}>
                                         <Card.Body>
                                             <ProblemNotes
-                                                complexity={problem.complexity}
+                                                timeComplexity={problem.timeComplexity}
+                                                spaceComplexity={problem.spaceComplexity}
                                                 link={problem.link}
                                                 linkTitle={problem.linkTitle}
                                                 notes={problem.notes}
