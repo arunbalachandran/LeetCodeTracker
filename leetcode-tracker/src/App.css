@@ -109,3 +109,40 @@
 .code-snippet-container .tab-content {
     background-color: #fff;
 }
+
+.problem-label {
+    transition: all 0.2s ease;
+}
+
+.problem-label:hover {
+    opacity: 0.8;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+}
+
+.label-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-right: 10px;
+}
+
+/* Adjust spacing for problem info section on the right */
+.problem-info {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+/* remove background color for the expand button underlying div*/
+.table>:not(caption)>*>* {
+    background-color: transparent;
+}
+
+/* Ensure the expand button stays on the far right */
+.expand-button {
+    margin-left: 10px;
+}

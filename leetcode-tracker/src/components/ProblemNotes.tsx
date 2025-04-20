@@ -1,12 +1,13 @@
 import { CodeSnippet } from './CodeSnippet';
 import { codeSnippets } from '../codeSnippets';
 
-export const ProblemNotes = ({complexity, notes, link, linkTitle}: {complexity:string, notes: string, link: string, linkTitle: string}) => {
+export const ProblemNotes = ({timeComplexity, spaceComplexity, notes, link, linkTitle}: {timeComplexity:string, spaceComplexity:string, notes: string, link: string, linkTitle: string}) => {
     const snippets = codeSnippets[linkTitle];
     
     return (
         <>
-            <p>Complexity: {complexity}</p>
+            <p>Time Complexity: {timeComplexity}</p>
+            <p>Space Complexity: {spaceComplexity}</p>
             <p>Link: <a href={link}>{linkTitle}</a></p>
             <p>Notes: {notes}</p>
             {snippets && (
