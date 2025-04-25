@@ -9,6 +9,7 @@ interface Problem {
   labels?: string[];
 }
 
+// TODO: validate the time & space complexity
 const problems: Problem[] = [
   {
     timeComplexity: 'O(n)',
@@ -223,6 +224,56 @@ const problems: Problem[] = [
     `,
     difficulty: 2,
     category: 'Heap, Queue & Stacks',
+    labels: ['Grind 75']
+  },
+  {
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(n)',
+    link: 'https://leetcode.com/problems/longest-substring-without-repeating-characters/',
+    linkTitle: 'Longest Substring Without Repeating Characters',
+    notes: `
+    ...
+    `,
+    difficulty: 2,
+    category: 'Two Pointers',
+    labels: ['Grind 75', 'Revisit']
+  },
+  {
+    timeComplexity: 'O(n^2)',
+    spaceComplexity: 'O(n)',
+    link: 'https://leetcode.com/problems/3sum/',
+    linkTitle: '3sum',
+    notes: `
+    ...
+    `,
+    difficulty: 2,
+    category: 'Two Pointers',
+    labels: ['Grind 75', 'Revisit']
+  },
+  {
+    timeComplexity: 'O(n^2)',
+    spaceComplexity: 'O(n)',
+    link: 'https://leetcode.com/problems/binary-tree-level-order-traversal/',
+    linkTitle: 'Binary Tree Level Order Traversal',
+    notes: `
+    ...
+    `,
+    difficulty: 2,
+    category: 'Trees',
+    labels: ['Grind 75', 'Revisit']
+  },
+  {
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(n)',
+    link: 'https://leetcode.com/problems/clone-graph/',
+    linkTitle: 'Clone Graph',
+    notes: `
+    Craete a helper for cloning the graph. Create a hashmap to track previously visited nodes.
+    Recursively clone the graph and visit the neighbors and start closing them. Use the previously created hashmap so that previously visited
+    neighbors can be looked up without recloning them.
+    `,
+    difficulty: 2,
+    category: 'Trees',
     labels: ['Grind 75']
   }
 ];

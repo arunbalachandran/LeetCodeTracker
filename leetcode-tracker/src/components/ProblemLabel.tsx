@@ -11,6 +11,8 @@ const getLabelColor = (label: string): { backgroundColor: string, color: string 
             return { backgroundColor: '#00af9b', color: 'white' };
         case 'Blind 75':
             return { backgroundColor: '#ff2d55', color: 'white' };
+        case 'Revisit':
+            return { backgroundColor: '#696969', color: 'white' };
         default:
             return { backgroundColor: '#aaaaaa', color: 'white' };
     }

@@ -142,6 +142,9 @@
     background-color: transparent;
 }
 
+:not(pre) > pre[class*="language-"] {
+    background: transparent;
+}
 /* Ensure the expand button stays on the far right */
 .expand-button {
     margin-left: 10px;

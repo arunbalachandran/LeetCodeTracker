@@ -694,5 +694,191 @@ class Solution {
     }
 }`,
         python: ``
+    },
+    'Longest Substring Without Repeating Characters': {
+        java: `import java.util.HashMap;
+
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        int i = 0;
+        int j = 1;
+        int maxWindow = 0;
+        if (s.length() <= 1) {
+            return s.length();
+        }
+
+        HashMap<Character, Integer> charMap = new HashMap<>();
+        charMap.put(s.charAt(i), i);
+        while (j < s.length()) {
+            Character currentChar = s.charAt(j);
+            if (charMap.containsKey(currentChar)) {
+                i = Math.max(i, charMap.get(currentChar) + 1);
+                charMap.put(currentChar, j);
+            }
+            charMap.put(currentChar, j);
+            maxWindow = Math.max(maxWindow, j - i + 1);
+            j++;
+        }
+
+        return maxWindow;
+    }
+}`,
+        python: ``
+    },
+    '3sum': {
+        java: `import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
+
+class Solution {
+
+    public List<List<Integer>> threeSum(int[] nums) {
+        Arrays.sort(nums);
+        HashSet<List<Integer>> triplets = new HashSet<>();
+
+        for (int i = 0; i < nums.length; i++) {
+            int leftIndex = 0;
+            int rightIndex = nums.length - 1;
+            while (leftIndex < i && rightIndex > i) {
+                int sum = nums[leftIndex] + nums[rightIndex] + nums[i];
+                if (sum == 0) {
+                    triplets.add(List.of(nums[leftIndex], nums[i], nums[rightIndex]));
+                    leftIndex++;
+                    rightIndex--;
+                } else if (sum < 0) {
+                    leftIndex++;
+                } else {
+                    rightIndex--;
+                }
+            }
+        }
+
+        return triplets.stream().toList();
+    }
+}
+`,
+        python: ``
+    },
+    'Binary Tree Level Order Traversal': {
+        java: `/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.PriorityQueue;
+
+class Solution {
+    
+    private int height(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        return Math.max(height(root.left), height(root.right)) + 1;
+    }
+    
+    private List<Integer> levelOrderHelper(List<Integer> result, TreeNode root, int targetHeight, int currentHeight) {
+        if (root == null) {
+            return result;
+        }
+                
+        if (targetHeight == currentHeight) {
+            result.add(root.val);
+            return result;
+        } else if (currentHeight > targetHeight) {
+            levelOrderHelper(result, root.left, targetHeight, currentHeight - 1);
+            levelOrderHelper(result, root.right, targetHeight, currentHeight - 1);
+        }
+        
+        return result;
+    }
+    
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> result = new ArrayList<>();
+        
+        // Iterative solution
+        Deque<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        
+        while (!queue.isEmpty()) {
+            int queueSize = queue.size();
+            List<Integer> subresult = new ArrayList<>();
+            for (int i = 0; i < queueSize; i++) {
+                TreeNode temp = queue.pollFirst();
+                if (temp != null) {
+                    subresult.add(temp.val);
+                    queue.addLast(temp.left);
+                    queue.addLast(temp.right);   
+                }
+            }
+            
+            if (!(subresult.size() == 0 && queue.isEmpty())) {
+                result.add(subresult);
+            }
+
+        }
+        
+        return result;
+    }
+}`,
+        python: ``
+    },
+    'Clone Graph': {
+        java: `/*
+// Definition for a Node.
+class Node {
+    public int val;
+    public List<Node> neighbors;
+    public Node() {
+        val = 0;
+        neighbors = new ArrayList<Node>();
+    }
+    public Node(int _val) {
+        val = _val;
+        neighbors = new ArrayList<Node>();
+    }
+    public Node(int _val, ArrayList<Node> _neighbors) {
+        val = _val;
+        neighbors = _neighbors;
+    }
+}
+*/
+
+class Solution {
+
+    private Node cloneGraphHelper(Node node, HashMap<Node, Node> nodeMap) {
+        if (nodeMap.containsKey(node)) {
+            return nodeMap.get(node);
+        }
+
+        Node clonedNode = new Node(node.val);
+        clonedNode.neighbors = new ArrayList<>();
+        nodeMap.put(node, clonedNode);
+        for (Node neighbor: node.neighbors) {
+            clonedNode.neighbors.add(cloneGraphHelper(neighbor, nodeMap));
+        }
+
+        return clonedNode;
+    }
+
+    public Node cloneGraph(Node node) {
+        HashMap<Node, Node> nodeMap = new HashMap<>();
+        return node != null ? cloneGraphHelper(node, nodeMap) : node;
+    }
+}`,
+        python: ``
     }
 };
