@@ -82,19 +82,54 @@ class Solution {
 }`,
         python: ``
     },
-    'Two Sum': {
-        java: `import java.util.HashMap;
-import java.util.Map;
-
-class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        Map<Integer, Integer> sumDiffMap = new HashMap<>();
-        for (int i = 0; i < nums.length; i++) {
-            int diff = target - nums[i];
-            if (sumDiffMap.getOrDefault(nums[i], -1) != -1) {
-                return new int[] {sumDiffMap.get(nums[i]), i};
+    'Search in Rotated Sorted Array': {
+        java: `class Solution {
+    public int search(int[] nums, int target) {
+        int l = 0;
+        int r = nums.length - 1;
+        
+        while (l <= r) {
+            int mid = (l + r) / 2;
+            // check if we're in the left sorted portion
+            if (target == nums[mid]) {
+                return mid;
             }
-            sumDiffMap.put(diff, i);
+            
+            if (nums[l] <= nums[mid]) {
+                if (target < nums[l]) {
+                    l = mid + 1;
+                } else if (target > nums[mid]) {
+                    l = mid + 1;
+                } else {
+                    r = mid - 1;
+                }
+            } else {
+                if (target > nums[r]) {
+                    r = mid - 1;
+                } else if (target < nums[mid]) {
+                    r = mid - 1;
+                } else {
+                    l = mid + 1;
+                }
+            }
+        }
+        
+        return -1;
+    }
+}`,
+        python: ``
+    },
+    'Two Sum': {
+        java: `class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        HashMap<Integer, Integer> invMap = new HashMap<>();
+        int inverse = 0;
+        for (int i = 0; i < nums.length; i++) {
+            inverse = target - nums[i];
+            if (invMap.containsKey(nums[i])) {
+                return new int[] {invMap.get(nums[i]), i};
+            }
+            invMap.put(inverse, i);
         }
 
         return new int[] {-1, -1};
@@ -112,25 +147,27 @@ class Solution {
     'Valid Anagram': {
         java: `class Solution {
     public boolean isAnagram(String s, String t) {
+        // base case
         if (s.length() != t.length()) {
             return false;
         }
 
-        int NUM_ALPHABETS = 26;
-        int[] charMapSource = new int[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-        int[] charMapTarget = new int[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+        if (s == null && t == null) {
+            return true;
+        }
+
+        if (s.equals("") && s.equals(t)) {
+            return true;
+        }
+
+        HashMap<Character, Integer> charCountMap = new HashMap<>();
+        // increment count for every character from source & decrement for every character at target
         for (int i = 0; i < s.length(); i++) {
-            charMapSource[s.charAt(i) - 'a'] += 1;
-            charMapTarget[t.charAt(i) - 'a'] += 1;
+            charCountMap.put(s.charAt(i), charCountMap.getOrDefault(s.charAt(i), 0) + 1);
+            charCountMap.put(t.charAt(i), charCountMap.getOrDefault(t.charAt(i), 0) - 1);
         }
 
-        for (int i = 0; i < NUM_ALPHABETS; i++) {
-            if (charMapSource[i] != charMapTarget[i]) {
-                return false;
-            }
-        }
-
-        return true;
+        return charCountMap.keySet().stream().allMatch(ch -> charCountMap.get(ch) == 0);
     }
 }`,
         python: `class Solution:
@@ -151,6 +188,47 @@ class Solution {
             count_s[char] -= 1
 
         return True`
+    },
+    'Group Anagrams': {
+        java: `class Solution {
+
+    String ALPHABETS = "abcdefghijklmnopqrstuvwxyz";
+    // calculate the Run Length Encoding of a String
+    // e.g.: abca => a2b1c1
+    private String getRle(String src) {
+        int[] countArr = new int[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+        for (int i = 0; i < src.length(); i++) {
+            countArr[src.charAt(i) - 'a'] += 1;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < ALPHABETS.length(); i++) {
+            if (countArr[ALPHABETS.charAt(i) - 'a'] != 0) {
+                sb.append(ALPHABETS.charAt(i));
+                sb.append(countArr[ALPHABETS.charAt(i) - 'a']);
+            }
+        }
+        return sb.toString();
+    }
+    
+
+    public List<List<String>> groupAnagrams(String[] strs) {
+        HashMap<String, List<String>> strMap = new HashMap<>();
+        String rle = "";
+        for (String str: strs) {
+            rle = getRle(str);
+            if (strMap.containsKey(rle)) {
+                strMap.get(rle).add(str);
+            } else {
+                strMap.put(rle, new ArrayList<>());
+                strMap.get(rle).add(str);
+            }
+        }
+
+        return strMap.values().stream().toList();
+    }
+}`,
+        python: ``
     },
     'Valid Palindrome': {
         java: `class Solution {
@@ -268,7 +346,7 @@ class Solution {
     'Invert Binary Tree': {
         java: `class Solution {
     public TreeNode invertTree(TreeNode root) {
-        if(root == null) {
+        if (root == null) {
             return null;
         }
 
@@ -701,31 +779,27 @@ class Solution {
 class Solution {
     public int lengthOfLongestSubstring(String s) {
         int i = 0;
-        int j = 1;
-        int maxWindow = 0;
-        if (s.length() <= 1) {
-            return s.length();
-        }
-
+        int largestWindow = 0;
+        // use this to store the previous position of a character you've seen
         HashMap<Character, Integer> charMap = new HashMap<>();
-        charMap.put(s.charAt(i), i);
-        while (j < s.length()) {
-            Character currentChar = s.charAt(j);
-            if (charMap.containsKey(currentChar)) {
-                i = Math.max(i, charMap.get(currentChar) + 1);
-                charMap.put(currentChar, j);
-            }
-            charMap.put(currentChar, j);
-            maxWindow = Math.max(maxWindow, j - i + 1);
-            j++;
-        }
+        
+        for (int j = 0; j < s.length(); j++) {
+            char c = s.charAt(j);
 
-        return maxWindow;
+            // if you've seen the character before (this will come in effect especially for a palindromic case)
+            if (charMap.containsKey(c)) {
+                i = Math.max(i, charMap.get(c) + 1);
+            }
+            largestWindow = Math.max(largestWindow, j - i + 1);
+            charMap.put(c, j);
+        }
+        
+        return largestWindow;
     }
 }`,
         python: ``
     },
-    '3sum': {
+    '3Sum': {
         java: `import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -738,14 +812,21 @@ class Solution {
         HashSet<List<Integer>> triplets = new HashSet<>();
 
         for (int i = 0; i < nums.length; i++) {
-            int leftIndex = 0;
+            if (i > 0 && nums[i] == nums[i-1]) {
+                continue;
+            }
+
+            int leftIndex = i + 1;
             int rightIndex = nums.length - 1;
-            while (leftIndex < i && rightIndex > i) {
-                int sum = nums[leftIndex] + nums[rightIndex] + nums[i];
+            int sum = 0;
+            while (leftIndex < rightIndex) {
+                sum = nums[leftIndex] + nums[rightIndex] + nums[i];
                 if (sum == 0) {
                     triplets.add(List.of(nums[leftIndex], nums[i], nums[rightIndex]));
                     leftIndex++;
-                    rightIndex--;
+                    while (nums[leftIndex] == nums[leftIndex - 1] && leftIndex < rightIndex) {
+                        leftIndex++;
+                    }
                 } else if (sum < 0) {
                     leftIndex++;
                 } else {
@@ -756,8 +837,7 @@ class Solution {
 
         return triplets.stream().toList();
     }
-}
-`,
+}`,
         python: ``
     },
     'Binary Tree Level Order Traversal': {
@@ -782,29 +862,6 @@ import java.util.Deque;
 import java.util.PriorityQueue;
 
 class Solution {
-    
-    private int height(TreeNode root) {
-        if (root == null) {
-            return 0;
-        }
-        return Math.max(height(root.left), height(root.right)) + 1;
-    }
-    
-    private List<Integer> levelOrderHelper(List<Integer> result, TreeNode root, int targetHeight, int currentHeight) {
-        if (root == null) {
-            return result;
-        }
-                
-        if (targetHeight == currentHeight) {
-            result.add(root.val);
-            return result;
-        } else if (currentHeight > targetHeight) {
-            levelOrderHelper(result, root.left, targetHeight, currentHeight - 1);
-            levelOrderHelper(result, root.right, targetHeight, currentHeight - 1);
-        }
-        
-        return result;
-    }
     
     public List<List<Integer>> levelOrder(TreeNode root) {
         List<List<Integer>> result = new ArrayList<>();
@@ -877,6 +934,767 @@ class Solution {
     public Node cloneGraph(Node node) {
         HashMap<Node, Node> nodeMap = new HashMap<>();
         return node != null ? cloneGraphHelper(node, nodeMap) : node;
+    }
+}`,
+        python: ``
+    },
+    'Top K Frequent Elements': {
+        java: `import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+
+class Solution {
+    public int[] topKFrequent(int[] nums, int k) {
+        // create bucket to invert numbers by count
+        List<List<Integer>> bucket = new ArrayList<>();
+        HashMap<Integer, Integer> countMap = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+            int frequency = countMap.getOrDefault(nums[i], 0);
+            countMap.put(nums[i], frequency + 1);
+            bucket.add(new ArrayList<>());
+        }
+        // because lists are 0 indexed (frequency max is size of nums)
+        bucket.add(new ArrayList<>());
+
+        countMap.keySet().stream().forEach(
+            key -> bucket.get(countMap.get(key)).add(key)
+        );
+
+        // now return the first k elements
+        List<Integer> result = new ArrayList<>();
+        for (int i = bucket.size() - 1; i >= 0; i--) {
+            while (bucket.get(i).size() > 0 && result.size() < k) {
+                result.add(bucket.get(i).get(0));
+                bucket.get(i).remove(0);
+            }
+        }
+
+
+        return result.stream().mapToInt(i -> i).toArray();
+    }
+}`,
+        python: ``
+    },
+    'Encode and Decode Strings': {
+        java: `import java.util.stream.Collectors;
+import java.util.List;
+import java.util.ArrayList;
+
+public class Codec {
+
+    public String rleString(String input) {
+        return String.format("%s#", input.length());
+    }
+
+    // Encodes a list of strings to a single string.
+    public String encode(List<String> strs) {
+        return strs.stream().map(val -> rleString(val) + val).collect(Collectors.joining(""));
+    }
+
+    // i is starting position of string to consider from
+    public Map<Integer, String> getRle(String s, int i) {
+        StringBuilder sb = new StringBuilder();
+        while (i < s.length() && Character.isDigit(s.charAt(i))) {
+            sb.append(s.charAt(i));
+            i++;
+        }
+        i++; // to go after the # symbol
+        String rle = sb.toString();
+        Integer rleLength = Integer.parseInt(rle);
+        return Map.of(i + rleLength, s.substring(i, i + rleLength));
+    }
+
+    // Decodes a single string to a list of strings.
+    public List<String> decode(String s) {
+        // find pattern matching RLE (if no match, keep continuing) otherwise, find the count
+        // of characters expected & verify that there are those many
+        List<String> result = new ArrayList<>();
+        System.out.println(s);
+        int i = 0;
+        while (i < s.length()) {
+            Map<Integer, String> rleMatch = getRle(s, i);
+            Integer newIndex = rleMatch.keySet().stream().findFirst().get();
+            String matchedString = rleMatch.get(newIndex);
+            result.add(matchedString);
+            i = newIndex;
+        }
+i
+        return result;
+    }
+}
+
+// Your Codec object will be instantiated and called as such:
+// Codec codec = new Codec();
+// codec.decode(codec.encode(strs));`,
+        python: ``
+    },
+    'Product of Array Except Self': {
+        java: `class Solution {
+    public int[] productExceptSelf(int[] nums) {
+        int[] result = new int[nums.length];
+        
+        result[0] = 1;
+        for (int i = 1; i < nums.length; i++) {
+            result[i] = result[i-1] * nums[i-1];
+        }
+        
+        int multiplier = 1;
+        // now go in reverse to calculate sums the other way
+        for (int j = nums.length - 1; j >= 0; j--) {
+            result[j] = result[j] * multiplier;
+            multiplier = multiplier * nums[j];
+        }
+        
+        return result;
+    }
+}
+`,
+        python: ``
+    },
+    'Longest Consecutive Sequence': {
+        java: `import java.util.HashSet;
+
+class Solution {
+    public int longestConsecutive(int[] nums) {
+        
+        if (nums.length == 0) {
+            return 0;
+        }
+        
+        HashSet<Integer> numSet = new HashSet<>();
+        for (int i = 0; i < nums.length; i++) {
+            numSet.add(nums[i]);
+        }
+
+        int maxStreak = 1;
+        int currentStreak = 1;
+        int currentNum = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (numSet.contains(nums[i] - 1)) {
+                continue;   // this will be considered when you find the smaller number & calc streak
+            }
+            
+            currentStreak = 1;
+            currentNum = nums[i];
+            while (numSet.contains(currentNum + 1)) {
+                currentStreak++;
+                currentNum++;
+                maxStreak = Math.max(maxStreak, currentStreak);
+            }
+        }
+
+        return maxStreak;
+    }
+}`,
+        python: ``
+    },
+    'Container With Most Water': {
+        java: `
+class Solution {
+    public int maxArea(int[] height) {
+        int i = 0;
+        int j = height.length - 1;
+        int volume = 0;
+        int maxVolume = 0;
+        while (i < j) {
+            volume = height[i] >= height[j] ? height[j] * (j - i) : height[i] * (j - i);
+            maxVolume = Math.max(volume, maxVolume);
+            if (height[i] >= height[j]) {
+                j--;
+            } else {
+                i++;
+            }
+        }
+        return maxVolume;
+    }
+}`,
+        python: ``
+    },
+    'Longest Repeating Character Replacement': {
+        java: `import java.util.HashMap;
+import java.util.Map;
+
+class Solution {
+    public int characterReplacement(String s, int k) {
+        int i = 0;   // left window
+        int maxWindow = 0;
+        int maxFreq = 0;
+        Map<Character, Integer> countMap = new HashMap<>();
+        
+        for (int j = 0; j < s.length(); j++) {
+            int currentCount = countMap.getOrDefault(s.charAt(j), 0);
+            countMap.put(s.charAt(j), currentCount + 1);
+            maxFreq = Math.max(maxFreq, countMap.get(s.charAt(j)));
+            while ((j - i + 1) - maxFreq > k) {
+                int charCount = countMap.get(s.charAt(i));
+                countMap.put(s.charAt(i), charCount - 1);
+                i++;
+            }
+            maxWindow = Math.max(maxWindow, j - i + 1);
+        }
+
+        return maxWindow;
+    }
+}`,
+        python: ``
+    },
+    'Minimum Window Substring': {
+        java: ``,
+        python: ``
+    },
+    'Reverse Linked List': {
+        java: `/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        
+        ListNode current = head;
+        ListNode next = current.next;
+        ListNode backup = null;
+        while (next != null) {
+            backup = next.next;
+            next.next = current;
+            if (current == head) {
+                current.next = null;
+            }
+            current = next;
+            next = backup;
+        }
+        return current;
+    }
+}`,
+        python: ``
+    },
+    'Reorder List': {
+        java: `/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+
+class Solution {
+    public void reorderList(ListNode head) {
+        // first let's find the second half of the list
+        ListNode slow = head;
+        ListNode fast = head;
+        
+        if (head == null || head.next == null) {
+            return;
+        }
+        
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        
+        ListNode first = head;
+        ListNode second = slow.next;
+        slow.next = null;
+        ListNode previous = null;
+        ListNode temp = null;
+        
+        // reversal
+        while (second != null) {
+            temp = second.next;
+            second.next = previous;
+            previous = second;
+            second = temp;
+        }
+        
+        // now merge the original and reversed parts of the lists
+        second = previous;
+        while (second != null) { // assuming second can be smaller
+            ListNode temp1 = first.next;
+            ListNode temp2 = second.next;
+            first.next = second;
+            second.next = temp1;
+            first = temp1;
+            second = temp2;
+        }
+    }
+}`,
+        python: ``
+    },
+    'Remove Nth Node From End of List': {
+        java: `/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode ptr = head;
+        ListNode offsetPtr = ptr;
+        ListNode dummyHead = new ListNode();
+        ListNode previous = dummyHead;
+        dummyHead.next = head;
+            
+        for (int i = 0; i < n; i++) {
+            offsetPtr = offsetPtr.next;
+        }
+        
+        while (ptr != null && offsetPtr != null) {
+            previous = ptr;
+            ptr = ptr.next;
+            offsetPtr = offsetPtr.next;
+        }
+        
+        previous.next = ptr.next;
+        return dummyHead.next;
+    }
+}`,
+        python: ``
+    },
+    'Merge k Sorted Lists': {
+        java: `/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+
+import java.util.List;
+import java.util.ArrayList;
+
+class Solution {
+    public ListNode mergeKLists(ListNode[] lists) {
+        List<ListNode> arrayList = new ArrayList<>();
+        for (ListNode listNode: lists) {
+            arrayList.add(listNode);
+        }
+        
+        while (arrayList.size() > 1) {
+            int arrayListSize = arrayList.size();
+            List<ListNode> temp = new ArrayList<>();
+            for (int i = 0; i < arrayListSize; i += 2) {
+                temp.add(merge2Lists(arrayList, i, i + 1));
+            }
+            arrayList = temp;
+        }
+        
+        return arrayList.size() > 0 ? arrayList.get(0) : null;
+    }
+    
+    private ListNode merge2Lists(List<ListNode> arrayList, int head1, int head2) {
+        if (head2 >= arrayList.size()) {
+            return arrayList.get(head1);
+        }
+        
+        // assuming that head1 will never be null
+        ListNode h1 = arrayList.get(head1);
+        ListNode h2 = arrayList.get(head2);
+        ListNode dummy = new ListNode();
+        ListNode tail = dummy;
+        
+        while (h1 != null && h2 != null) {
+            if (h1.val > h2.val) {
+                tail.next = h2;
+                h2 = h2.next;
+            } else {
+                tail.next = h1;
+                h1 = h1.next;
+            }
+            tail = tail.next;
+        }
+        
+        
+        // add the remaining nodes to the other list (if one of the lists are done)
+        if (h1 == null) {
+            tail.next = h2;
+        } else {
+            tail.next = h1;
+        }
+        
+        return dummy.next;
+    }
+}`,
+        python: ``
+    },
+    'Maximum Depth of Binary Tree': {
+        java: `/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    int maxDept = 0;
+    public int maxDepth(TreeNode root) {
+        if(root == null) {
+            return 0;
+        }
+
+        int left = maxDepth(root.left);
+        int right = maxDepth(root.right);
+
+        return Math.max(left, right) + 1;
+    }
+}`,
+        python: ``
+    },
+    'Same Tree': {
+        java: `/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        if(p == null && q == null) {
+            return true;
+        }
+
+        if(p == null || q == null || p.val != q.val) {
+            return false;
+        }
+
+        return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+    }
+}`,
+        python: ``
+    },
+    'Subtree of Another Tree': {
+        java: `/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+        if (root != null) {
+            if (root.val == subRoot.val) {
+                return checkSameTree(root, subRoot) || isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+            } else {
+                return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+            }
+        }
+        return false;
+    }
+    
+    private boolean checkSameTree(TreeNode p, TreeNode q) {
+        if (p == null && q == null) {
+            return true;
+        } else {
+            if ((p != null && q == null) || (p == null && q != null)) {
+                return false;
+            } else {
+                if (p.val == q.val) {
+                    return checkSameTree(p.left, q.left) && checkSameTree(p.right, q.right);
+                }
+                return false;
+            }
+        }
+    }
+}`,
+        python: ``
+    },
+    'Merge Intervals': {
+        java: `class Solution {
+    public int[][] merge(int[][] intervals) {
+        ArrayList<int[]> intervalStore = new ArrayList<int[]>();
+        
+        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
+        int[] newInterval = intervals[0];
+
+        for (int i = 1; i < intervals.length; i++) {
+            int[] currentInterval = intervals[i];
+            if (currentInterval[1] < newInterval[0]) {
+                intervalStore.add(currentInterval);
+            } else if (currentInterval[0] > newInterval[1]) {
+                intervalStore.add(newInterval);
+                newInterval = currentInterval;
+            } else {
+                // this is where the merge needs to happen
+                int intervalStart = Math.min(currentInterval[0], newInterval[0]);
+                int intervalEnd = Math.max(currentInterval[1], newInterval[1]);
+                newInterval[0] = intervalStart;
+                newInterval[1] = intervalEnd;
+            }
+        }
+        intervalStore.add(newInterval);
+        
+        // now convert it back to an array
+        return intervalStore.toArray(new int[intervalStore.size()][]);        
+    }
+}`,
+        python: ``
+    },
+    'Number of Islands': {
+        java: `import java.util.List;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.HashSet;
+
+class Pair {
+
+    public int x;
+    public int y;
+
+    public Pair(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    @Override
+    public int hashCode() {
+        int hashcode = 17;
+        hashcode = hashcode * 31 + this.x;
+        return hashcode * 31 + this.y;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        } else if (!(o instanceof Pair)) {
+            return false;
+        }
+
+        Pair incomingPair = (Pair) o;
+        return this.x == incomingPair.x && this.y == incomingPair.y;
+    }
+}
+
+class Solution {
+
+    private static final List<List<Integer>> directions = new ArrayList<List<Integer>>();
+
+    static {
+        directions.add(List.of(0, -1));  // down
+        directions.add(List.of(0, 1));   // up
+        directions.add(List.of(-1, 0));  // left
+        directions.add(List.of(1, 0));   // right
+    }
+
+    private void bfs(Pair currentNode, HashSet<Pair> visited, int numRows, int numCols, char[][] grid) {
+        Deque<Pair> deque = new LinkedList<Pair>();
+        deque.add(currentNode);
+        visited.add(currentNode);
+        while (!deque.isEmpty()) {
+            Pair node = deque.pollFirst();  // gives us the first node from the left in the Deque
+            for (int k = 0; k < directions.size(); k++) {
+                int offsetRow = directions.get(k).get(0) + node.x;
+                int offsetCol = directions.get(k).get(1) + node.y;
+                boolean validCoordinates = (offsetRow >= 0 && offsetRow < numRows && offsetCol >= 0 && offsetCol < numCols);
+                Pair offsetPair = new Pair(offsetRow, offsetCol);
+                if (validCoordinates && !visited.contains(offsetPair) && grid[offsetRow][offsetCol] == '1') {
+                    deque.add(offsetPair);
+                    visited.add(offsetPair);
+                }
+            }
+        }
+    }
+
+    public int numIslands(char[][] grid) {
+        int numIslands = 0;
+        int numRows = grid.length;
+        if (numRows == 0) {
+            return numIslands;
+        }
+
+        int numCols = grid[0].length;
+        if (numCols == 0) {
+            return numIslands;
+        }
+
+        HashSet<Pair> visited = new HashSet<>();
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                Pair currentPair = new Pair(i, j);
+                if (grid[i][j] == '1' && !visited.contains(currentPair)) {
+                    bfs(currentPair, visited, numRows, numCols, grid); // explore the island that starts at this node using BFS
+                    numIslands++;
+                }
+            }
+        }
+
+        return numIslands;
+    }
+}`,
+        python: ``
+    },
+    'Combination Sum': {
+        java: `import java.util.ArrayList;
+
+class Solution {
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<Integer> currentSub = new ArrayList<>();
+        List<List<Integer>> result = new ArrayList<>();
+        return combinationSumHelper(candidates, target, currentSub, 0, 0, result);
+    }
+    
+    // Assumptions:
+    // 1. sum fits in the 'int' variable
+    // 2. doesn't matter if the array is sorted or not
+    public List<List<Integer>> combinationSumHelper(
+        int[] candidates,
+        int target,
+        List<Integer> currentSub,
+        int i,
+        int total,
+        List<List<Integer>> result) {
+        if (total == target) {
+            result.add(new ArrayList<>(currentSub));
+            return result;
+        }
+        
+        if (i >= candidates.length || total > target) {
+            return result;
+        }
+        
+        // choose this candidate e.g.: [2] choosen out of [2, 3, 6, 7]
+        currentSub.add(candidates[i]);
+        // with [2] choosen, keep the same index (index 0) out of [2, 3, 6, 7]
+        combinationSumHelper(candidates, target, currentSub, i, total + candidates[i], result);
+        currentSub.remove(currentSub.size() - 1); // remove the most recently added element
+        // after 'unchoosing [2]' choose the other elements e.g.: [3, 6, 7]
+        combinationSumHelper(candidates, target, currentSub, i + 1, total, result);
+        return result;
+    }
+}`,
+        python: ``
+    },
+    'Backtracking': {
+        java: `import java.util.HashSet;
+
+class Pair {
+    
+    private int x;
+    private int y;
+    
+    public Pair(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+    
+    public int getx() {
+        return this.x;
+    }
+    
+    public int gety() {
+        return this.y;
+    }
+    
+    @Override
+    public int hashCode() {
+        int hashcode = 17;
+        hashcode = hashcode * 31 + this.x;
+        hashcode = hashcode * 31 + this.y;
+        return hashcode;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        
+        if (o == null) {
+            return false;
+        }
+        
+        if (!(o instanceof Pair)) {
+            return false;
+        }
+        
+        Pair incomingPair = (Pair) o;
+        return incomingPair.getx() == this.x && incomingPair.gety() == this.y;
+    }
+}
+
+class Solution {
+    
+    private boolean dfs(int wordIndex, String word, int i, int j, char[][] board, HashSet<Pair> visited) {
+        if (wordIndex == word.length()) {
+            return true;
+        }
+        
+        Pair currentPair = new Pair(i, j);
+        boolean validrow = (i >= 0 && i < board.length);
+        boolean validcol = (j >= 0 && j < board[0].length);
+        if (!validrow || !validcol || !(board[i][j] == word.charAt(wordIndex)) || visited.contains(currentPair)) {
+            return false;
+        }
+            
+        visited.add(currentPair);
+        boolean result = dfs(wordIndex + 1, word, i - 1, j, board, visited) ||
+               dfs(wordIndex + 1, word, i + 1, j, board, visited) ||
+               dfs(wordIndex + 1, word, i, j - 1, board, visited) ||
+               dfs(wordIndex + 1, word, i, j + 1, board, visited);
+        visited.remove(currentPair);
+        return result;
+        
+    }
+    
+    public boolean exist(char[][] board, String word) {
+        int numRows = board.length;
+        int numCols = board[0].length;
+        if (word.length() > numRows * numCols) {
+            return false;
+        }
+        
+        HashSet<Pair> visited = new HashSet<>();
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                if (dfs(0, word, i, j, board, visited)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
 }`,
         python: ``
