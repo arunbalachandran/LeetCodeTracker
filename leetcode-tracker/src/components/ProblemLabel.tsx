@@ -7,7 +7,7 @@ interface ProblemLabelProps {
 const getLabelColor = (label: string): { backgroundColor: string, color: string } => {
     // Define colors for different label types
     switch (label) {
-        case 'Grind 75':
+        case 'Grind 23':
             return { backgroundColor: '#00af9b', color: 'white' };
         case 'Blind 75':
             return { backgroundColor: '#ff2d55', color: 'white' };
