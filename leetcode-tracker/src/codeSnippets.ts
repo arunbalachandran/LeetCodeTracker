@@ -192,40 +192,29 @@ class Solution {
     'Group Anagrams': {
         java: `class Solution {
 
-    String ALPHABETS = "abcdefghijklmnopqrstuvwxyz";
-    // calculate the Run Length Encoding of a String
-    // e.g.: abca => a2b1c1
-    private String getRle(String src) {
-        int[] countArr = new int[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-
-        for (int i = 0; i < src.length(); i++) {
-            countArr[src.charAt(i) - 'a'] += 1;
+    private String getRle(String str) {
+        int[] charCountMap = new int[26];
+        for (char ch: str.toCharArray()) {
+            charCountMap[ch - 'a'] += 1;
         }
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < ALPHABETS.length(); i++) {
-            if (countArr[ALPHABETS.charAt(i) - 'a'] != 0) {
-                sb.append(ALPHABETS.charAt(i));
-                sb.append(countArr[ALPHABETS.charAt(i) - 'a']);
-            }
+        for (int i = 0; i < 26; i++) {
+            sb.append(i + 'a');
+            sb.append((char)charCountMap[i]);
         }
         return sb.toString();
     }
-    
 
     public List<List<String>> groupAnagrams(String[] strs) {
-        HashMap<String, List<String>> strMap = new HashMap<>();
-        String rle = "";
+        HashMap<String, List<String>> map = new HashMap<>();
         for (String str: strs) {
-            rle = getRle(str);
-            if (strMap.containsKey(rle)) {
-                strMap.get(rle).add(str);
-            } else {
-                strMap.put(rle, new ArrayList<>());
-                strMap.get(rle).add(str);
+            String rle = getRle(str);
+            if (!map.containsKey(rle)) {
+                map.put(rle, new ArrayList<>());
             }
+            map.get(rle).add(str);
         }
-
-        return strMap.values().stream().toList();
+        return map.entrySet().stream().map(val -> val.getValue()).toList();
     }
 }`,
         python: ``
